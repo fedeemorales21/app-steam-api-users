@@ -1,7 +1,8 @@
 'use strict'
     document.querySelector('#id-profile')
         .addEventListener('keyup', function(){
-        getData(document.getElementById('id-profile').value)        
+        getData(document.getElementById('id-profile').value) 
+        getBans(document.getElementById('id-profile').value)       
     })
 
     function getData(id) {
@@ -50,14 +51,14 @@
                 }
 
                 function unixConvert(time){
-                    var dt = new Date(time*1000)
-                    var d = dt.getDay()
-                    var m = dt.getMonth()+1
-                    var y = dt.getFullYear()
+                    var dt = new Date(time*1000),
+                    d =  dt.getDate(),
+                    m =  dt.getMonth()+1,
+                    y =  dt.getFullYear()
+
                     return `${d}/${m}/${y}`
                 }
 
-                // console.log(data)
                  res.innerHTML = `<img src="${data.avatarfull}" class="img-fluid mx-auto d-block mb-4">
                  <div class="row text-white mx-auto text-center">
                      <div class="col-md-6">
@@ -70,7 +71,41 @@
                          <p class="font-weight-bold">Profile URL : <a href="${data.profileurl}" target="_blank">Link</a></p>
                          <p class="font-weight-bold">Status : ${data.personastate}</p>
                          <p class="font-weight-bold">Date of Account Creation : ${unixConvert(data.timecreated)}</p>
-                         <p class="font-weight-bold">last connection ago : ${unixConvert(data.lastlogoff)}</p>
+                         <p class="font-weight-bold">Last Connection Ago : ${unixConvert(data.lastlogoff)}</p>
+                     </div>
+                 </div>`
+               
+
+                
+            }
+        }
+    }
+
+    function getBans(id) {
+        let url = `http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=F95C34E0D5A2B1449D4756262869476B&steamids=${id}`
+
+        const http = new XMLHttpRequest
+
+        http.open('GET',url,true)
+        http.send()
+
+        http.onreadystatechange = function(){
+            if (this.readyState ==  4  && this.status == 200) {
+                const res = document.querySelector('#res')
+                
+                let data = JSON.parse(this.responseText).players[0]
+                
+                 res.innerHTML += `
+                 <div class="row text-white mx-auto text-center">
+                     <div class="col-md-6">
+                         <p class="font-weight-bold">Community Banned : ${data.CommunityBanned}</p>
+                         <p class="font-weight-bold">VAC Banned : ${data.VACBanned}</p>
+                         <p class="font-weight-bold">Number Of VAC Bans : ${data.NumberOfVACBans}</p>
+                         </div>
+                         <div class="col-md-6">
+                         <p class="font-weight-bold">Days Since Last Ban : ${data.DaysSinceLastBan}</p>
+                         <p class="font-weight-bold">Number Of Game Bans : ${data.NumberOfGameBans}</p>
+                         <p class="font-weight-bold">Economy Ban : ${data.EconomyBan}</p>
                      </div>
                  </div>`
                
